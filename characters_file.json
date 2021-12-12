@@ -1,0 +1,19 @@
+{
+    "mains": {
+        "Taelor": {
+            "buddies": [
+                "Devour",
+                "Spaide"
+            ] 
+        },  
+        "Gadzooks": {
+            "buddies": [
+                "Darchon",
+                "Slouch",
+                "Ziva",
+                "Thucydides"
+            ]
+        }
+    }
+
+}
