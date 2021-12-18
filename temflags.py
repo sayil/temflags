@@ -90,6 +90,8 @@ def parse_attendance():
     missing_mains = list(set(mains).difference(attendees))
     missing_mains_flag_needed = []
     #print(missing_mains)
+    
+    missing_mains_no_buddy = []
 
     for main in missing_mains:
         flagged = member_flag_details[main][event]
@@ -118,7 +120,7 @@ def parse_attendance():
         
         flag_buddies = ", ".join(flag_buddies)
 
-        missing_mains_no_buddy = []
+        
 
         if(len(flag_buddies) > 0):
             print("Main: " + main)
@@ -127,8 +129,8 @@ def parse_attendance():
         else:
             missing_mains_no_buddy.append(main)
 
-    print("Mains with no flag buddies in attendance: ")
-    print(', '.join(missing_mains))
+    print("Missing mains with no flag buddies in attendance: ")
+    print(', '.join(missing_mains_no_buddy))
 
 
 
@@ -141,3 +143,5 @@ def cleanup():
 download_member_flags()
 parse_attendance()
 cleanup()
+
+
