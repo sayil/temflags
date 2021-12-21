@@ -2,9 +2,12 @@ import json
 import csv
 import requests
 
+pop_flags_url="https://docs.google.com/spreadsheets/d/19bFpL8zS8Zr22hPYOQgJ63c4MGtWFeF1J1AjauAbKxI"
+
 def download_member_flags():
     
-    member_progress_url="https://docs.google.com/spreadsheets/d/19bFpL8zS8Zr22hPYOQgJ63c4MGtWFeF1J1AjauAbKxI/export?format=csv&gid=0"
+    export_details = "/export?format=csv&gid=0"
+    member_progress_url=pop_flags_url + export_details
     res=requests.get(url=member_progress_url)
     open('member-flags.csv', 'wb').write(res.content)
 
@@ -13,15 +16,34 @@ def download_member_flags():
     with open('member-flags.csv', encoding='utf-8') as csvf:
         csvReader = csv.DictReader(csvf)
     
-        for rows in csvReader:
-
-            key = rows['Name']
-            data[key] = rows
+        for row in csvReader:
+            key = row['Name']
+            data[key] = row
 
     with open("member-flags.json", 'w', encoding='utf-8') as jsonf:
         jsonf.write(json.dumps(data, indent=4))
     
-    print("Member flags synced from: " + member_progress_url)
+    print("Member flags synced from: " + pop_flags_url + " using " + export_details)
+
+
+def download_all_mains():
+    
+    export_details = "/export?format=csv&gid=1536719939"
+    all_mains_url=pop_flags_url + export_details
+    res=requests.get(url=all_mains_url)
+    open('all-mains.csv', 'wb').write(res.content)
+
+    data = {}
+
+    with open('all-mains.csv', encoding='utf-8') as csvf:
+        csvReader = csv.DictReader(csvf)
+
+        for row in csvReader:
+            key = row['Name']
+            data[key] = row
+
+    with open("all-mains.json", 'w', encoding='utf-8') as jsonf:
+        jsonf.write(json.dumps(data, indent=4))
 
 
 
@@ -31,6 +53,9 @@ def parse_attendance():
     member_flags_file = 'member-flags.json';
     member_flag_details = json.load(open(member_flags_file, 'r'))
     mains = member_flag_details.keys()
+
+    all_mains_file = 'all-mains.json';
+    all_mains = json.load(open(all_mains_file, 'r')).keys()
 
     flag_events = member_flag_details['Taelor'].keys()
     event = ""
@@ -57,6 +82,13 @@ def parse_attendance():
     #print(attendees)
     #print('\n')
 
+    undocumented_main_attendees = list((set(attendees) & set(all_mains)).difference(mains))
+
+    print('\n')
+    print("These mains are in attendance but do not have an entry in the PoP flag tragger: ")
+    print(undocumented_main_attendees)
+    print('\n')
+
     main_attendees = list(set(mains) & set(attendees))
     #print("Main attendees: ")
     #print(main_attendees)
@@ -68,26 +100,16 @@ def parse_attendance():
         if flagged == "FALSE":
             main_attendees_flag_needed.append(main)
 
-    print('\n')
     print("Main attendees who need " + event + " flag: ")
-    print(main_attendees_flag_needed)
-    print('\n')
-
-    num_mains_flag_needed = len(main_attendees_flag_needed)
-    print("Number of main attendees who need " + event + " flag: ")
-    print(num_mains_flag_needed)
+    print(sorted(main_attendees_flag_needed))
     print('\n')
 
     #num_mains = len(main_attendees_flag_needed)
     #print("Number of main attendees who need a flag: ")
     #print(num_mains)
 
-    flags_remaining = 72 - num_mains_flag_needed
-    print("Flags remaining for alts: ")
-    print(flags_remaining)
-    print('\n')
-
-    missing_mains = list(set(mains).difference(attendees))
+    missing_mains = sorted(list(set(mains).difference(attendees)))
+  
     missing_mains_flag_needed = []
     #print(missing_mains)
     
@@ -98,10 +120,13 @@ def parse_attendance():
         if flagged == "FALSE":
             missing_mains_flag_needed.append(main)
 
+
+
     print("Missing mains who need  " + event + " flag: ")
     print(missing_mains_flag_needed)
     print('\n')
 
+    num_missing_mains_with_buddy = 0
     for main in missing_mains_flag_needed:
 
         flag_buddies = [] 
@@ -120,14 +145,28 @@ def parse_attendance():
         
         flag_buddies = ", ".join(flag_buddies)
 
-        
 
         if(len(flag_buddies) > 0):
-            print("Main: " + main)
+            num_missing_mains_with_buddy += 1
+            print(str(num_missing_mains_with_buddy) + ". " + main)
             print("Flag buddies: " + flag_buddies)
             print('\n')
         else:
             missing_mains_no_buddy.append(main)
+
+    num_mains_flag_needed = len(main_attendees_flag_needed)
+    print("Number of main attendees who need " + event + " flag: ")
+    print(num_mains_flag_needed)
+    print('\n')
+
+    print("Number of missing mains with a flag buddy in attendance: ")
+    print(num_missing_mains_with_buddy)
+    print('\n')
+
+    flags_remaining = 72 - num_mains_flag_needed - num_missing_mains_with_buddy
+    print("Flags remaining for alts: ")
+    print(flags_remaining)
+    print('\n')
 
     print("Missing mains with no flag buddies in attendance: ")
     print(', '.join(missing_mains_no_buddy))
@@ -141,7 +180,6 @@ def cleanup():
 
    
 download_member_flags()
+download_all_mains()
 parse_attendance()
 cleanup()
-
-
