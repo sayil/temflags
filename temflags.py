@@ -86,7 +86,7 @@ def parse_attendance():
 
     print('\n')
     print("These mains are in attendance but do not have an entry in the PoP flag tragger: ")
-    print(undocumented_main_attendees)
+    print(', '.join(sorted(undocumented_main_attendees)))
     print('\n')
 
     main_attendees = list(set(mains) & set(attendees))
@@ -100,8 +100,10 @@ def parse_attendance():
         if flagged == "FALSE":
             main_attendees_flag_needed.append(main)
 
-    print("Main attendees who need " + event + " flag: ")
-    print(sorted(main_attendees_flag_needed))
+    num_mains_flag_needed = len(main_attendees_flag_needed)
+
+    print(str(num_mains_flag_needed) + " main attendees who need " + event + " flag: ")
+    print(', '.join(sorted(main_attendees_flag_needed)))
     print('\n')
 
     #num_mains = len(main_attendees_flag_needed)
@@ -122,8 +124,13 @@ def parse_attendance():
 
 
 
-    print("Missing mains who need  " + event + " flag: ")
-    print(missing_mains_flag_needed)
+    #print("Missing mains who need  " + event + " flag: ")
+    #print(missing_mains_flag_needed)
+    #print('\n')
+
+    print('-----------------------------------------------------------------------')
+    print('\n')
+    print("Missing mains with a buddy in attendance who need  " + event + " flag: ")
     print('\n')
 
     num_missing_mains_with_buddy = 0
@@ -154,22 +161,23 @@ def parse_attendance():
         else:
             missing_mains_no_buddy.append(main)
 
-    num_mains_flag_needed = len(main_attendees_flag_needed)
-    print("Number of main attendees who need " + event + " flag: ")
-    print(num_mains_flag_needed)
+    print('-----------------------------------------------------------------------')
     print('\n')
+    #num_mains_flag_needed = len(main_attendees_flag_needed)
+    #print("Number of main attendees who need " + event + " flag: ")
+    #print(num_mains_flag_needed)
+    #print('\n')
 
-    print("Number of missing mains with a flag buddy in attendance: ")
-    print(num_missing_mains_with_buddy)
-    print('\n')
+    print("Number of main attendees who need " + event + " flag: " + str(num_mains_flag_needed))
+    print("Missing mains with a flag buddy in attendance: " + str(num_missing_mains_with_buddy))
 
     flags_remaining = 72 - num_mains_flag_needed - num_missing_mains_with_buddy
-    print("Flags remaining for alts: ")
-    print(flags_remaining)
+    print("Flags remaining for alts: " + str(flags_remaining))
     print('\n')
 
-    print("Missing mains with no flag buddies in attendance: ")
+    print("Missing mains with no flag buddies in attendance: " + str(len(missing_mains_no_buddy)))
     print(', '.join(missing_mains_no_buddy))
+    print('\n')
 
 
 
