@@ -85,7 +85,7 @@ def parse_attendance():
     undocumented_main_attendees = list((set(attendees) & set(all_mains)).difference(mains))
 
     print('\n')
-    print("These mains are in attendance but do not have an entry in the PoP flag tragger: ")
+    print("These mains are in attendance but do not have an entry in the PoP flag tracker: ")
     print(', '.join(sorted(undocumented_main_attendees)))
     print('\n')
 
